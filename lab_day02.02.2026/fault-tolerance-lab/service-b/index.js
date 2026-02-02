@@ -11,7 +11,7 @@ app.get('/error', (req, res) => {
 
 app.get('/delay', async (req, res) => {
   await new Promise(r => setTimeout(r, 5000));
-  res.json({ msg: 'DELAY' });
+  res.json({ msg: 'DELAY 5s' });
 });
 
 app.get('/random', (req, res) => {

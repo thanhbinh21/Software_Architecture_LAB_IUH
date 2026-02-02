@@ -1,27 +1,19 @@
-const { retry, circuitBreaker, bulkhead } = require('cockatiel');
+const {
+  circuitBreaker,
+  bulkhead,
+  ConsecutiveBreaker
+} = require('cockatiel');
 
-// Retry
-const retryPolicy = retry(handle =>
-  handle
-    .handleAll()
-    .retry()
-    .attempts(3)
+// CB: OPEN sau 3 lỗi liên tiếp
+const circuitBreakerPolicy = circuitBreaker(
+  new ConsecutiveBreaker(3),
+  { halfOpenAfter: 10000 }
 );
 
-// Circuit Breaker
-const circuitBreakerPolicy = circuitBreaker(handle =>
-  handle
-    .handleAll()
-    .breaker()
-    .halfOpenAfter(10000)
-    .openAfterFailures(3)
-);
-
-// Bulkhead
+// Bulkhead: tối đa 2 request song song
 const bulkheadPolicy = bulkhead(2);
 
 module.exports = {
-  retryPolicy,
   circuitBreakerPolicy,
   bulkheadPolicy
 };
