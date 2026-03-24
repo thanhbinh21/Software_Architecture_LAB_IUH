@@ -1,0 +1,31 @@
+
+1. Image opti + Image save data--> sẵn ít dữ liệu...(volume, network...layer)
+			dockerfile: cmd, entrypoint, run,...
+2. Xem: (20')
+		- Database partition: (SQl Server)
+					- Horizontal
+					- Vertical
+					- Function--> heidi
+		Ví dụ về 3 phần này: 
+				- DB (2 table_user_01 và table_use_02)--> condition--> 01 or 02 
+					(nam: table_user_01, nữ table_user_02)...> spring boot
+				- Vertical
+				- Function
+			--> Tăng performance
+				
+	3. mono--> 3 functions--> service-based architecture--> 1 DB (code BE + FE + DB)
+	
+	4. Chủ đề: Event choreography vs orchestration.
+		Bài tập
+		Thiết kế workflow đặt đơn thực phẩm:
+		Sử dụng Event Choreography.
+		Sử dụng Event Orchestration (có 1 orchestrator).
+		So sánh ưu nhược điểm.
+		Quyết định mô hình phù hợp với scaling + resilience.
+
+	
+	
+	
+		
+	
+			
