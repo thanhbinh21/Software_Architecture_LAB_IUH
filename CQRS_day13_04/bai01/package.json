@@ -1,0 +1,10 @@
+{
+  "name": "cqrs-ex1-todo-api",
+  "version": "1.0.0",
+  "description": "Simple CQRS Todo API exercise",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "license": "MIT"
+}

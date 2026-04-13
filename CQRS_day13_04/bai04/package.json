@@ -1,0 +1,9 @@
+{
+  "name": "cqrs-ex4-microservices",
+  "version": "1.0.0",
+  "description": "CQRS with simulated Microservices",
+  "scripts": {
+    "start": "node runner.js"
+  },
+  "license": "MIT"
+}

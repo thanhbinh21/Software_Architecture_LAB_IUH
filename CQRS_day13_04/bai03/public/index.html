@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Train Ticket CQRS</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="hero">
+        <p class="kicker">CQRS Exercise 3</p>
+        <h1>Train Ticket System</h1>
+        <p>Commands: Book/Cancel Ticket &bull; Queries: Search Trips, Get Tickets &bull; Events enabled.</p>
+      </section>
+
+      <!-- Commands Grid -->
+      <section class="grid">
+        <article class="card">
+          <h2>🎟 Book Ticket (Command)</h2>
+          <form id="book-form">
+            <label for="b-tripId">Trip ID</label>
+            <input id="b-tripId" type="text" placeholder="e.g. TR-001" required />
+            
+            <label for="b-passenger">Passenger Name</label>
+            <input id="b-passenger" type="text" placeholder="e.g. John Doe" required />
+            
+            <label for="b-seat">Seat Number</label>
+            <input id="b-seat" type="text" placeholder="e.g. A12" required />
+            
+            <label for="b-price">Price</label>
+            <input id="b-price" type="number" step="1000" min="0" placeholder="e.g. 150000" required />
+
+            <button type="submit" class="btn-primary">POST /tickets/book</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>🚫 Cancel Ticket (Command)</h2>
+          <form id="cancel-form">
+            <label for="c-id">Ticket ID</label>
+            <input id="c-id" type="text" placeholder="e.g. T001" required />
+            <button type="submit" class="btn-danger">PATCH /tickets/:id/cancel</button>
+          </form>
+        </article>
+      </section>
+
+      <!-- Read Model / Queries -->
+      <section class="card wide">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="trips">🚆 Search Trips (Query)</button>
+          <button class="tab-btn" data-tab="tickets">📋 Tickets (Read Model)</button>
+          <button class="tab-btn" data-tab="events">⚡ Event Log</button>
+        </div>
+
+        <div id="tab-trips">
+          <form id="search-form" class="search-bar" style="margin-bottom: 1.5rem; flex-direction:row;">
+            <input id="search-q" type="text" placeholder="Search by TR-001, Hà Nội, or Đà Nẵng..." />
+            <button type="submit" class="btn-primary" style="width:auto;">Search</button>
+          </form>
+          <div id="trips-container"></div>
+        </div>
+
+        <div id="tab-tickets" style="display:none;">
+          <div class="row">
+            <h2>Booked Tickets</h2>
+            <button id="refresh-tickets" class="btn-outline">GET /tickets</button>
+          </div>
+          <pre id="output-tickets">Loading...</pre>
+        </div>
+
+        <div id="tab-events" style="display:none;">
+          <div class="row">
+            <h2>Domain Events</h2>
+            <button id="refresh-events" class="btn-outline">GET /events</button>
+          </div>
+          <div id="output-events"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

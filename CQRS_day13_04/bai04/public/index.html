@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CQRS Microservices (Ex4)</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="hero">
+        <p class="kicker">CQRS Exercise 4</p>
+        <h1>CQRS + Microservices</h1>
+        <p>Command Service (Port 3004) &bull; Query Service (Port 3005) &bull; Communication via EventBus (Mock RabbitMQ/Kafka).</p>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>🚀 Command Service (:3004)</h2>
+          <hr style="border: 1px solid var(--panel-border); margin: 15px 0;">
+          <h3 style="margin-bottom: 10px; font-size: 1rem;">📦 Create Order</h3>
+          <form id="create-form">
+            <label for="customer-name">Customer Name</label>
+            <input id="customer-name" type="text" placeholder="e.g. Alice" required />
+            <button type="submit" class="btn-primary">POST http://localhost:3004/orders</button>
+          </form>
+
+          <h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🚫 Cancel Order</h3>
+          <form id="cancel-form">
+            <label for="cancel-id">Order ID</label>
+            <input id="cancel-id" type="text" placeholder="e.g. 1" required />
+            <button type="submit" class="btn-danger">PATCH http://localhost:3004/orders/:id/cancel</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>🔍 Query Service (:3005)</h2>
+          <hr style="border: 1px solid var(--panel-border); margin: 15px 0;">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="orders">📋 Orders</button>
+            <button class="tab-btn" data-tab="events">⚡ Broker Log</button>
+          </div>
+
+          <div id="tab-orders">
+            <div class="row">
+              <h3 style="font-size: 1rem;">All Orders</h3>
+              <button id="refresh-btn" type="button" class="btn-outline">GET :3005/orders</button>
+            </div>
+            <pre id="output-orders">Loading...</pre>
+          </div>
+
+          <div id="tab-events" style="display:none;">
+            <div class="row">
+              <h3 style="font-size: 1rem;">Events</h3>
+              <button id="refresh-events-btn" type="button" class="btn-outline">GET :3005/events</button>
+            </div>
+            <div id="output-events"></div>
+          </div>
+        </article>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

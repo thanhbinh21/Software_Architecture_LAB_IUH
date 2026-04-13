@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order CQRS Tester (with Events)</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <!-- ── hero ─────────────────────────────────────────────────── -->
+      <section class="hero">
+        <p class="kicker">CQRS Exercise 2</p>
+        <h1>Order System (with Events)</h1>
+        <p>Commands emit domain events &rarr; EventBus &rarr; Read Model is updated &rarr; Queries read from the projection.</p>
+      </section>
+
+      <!-- ── command cards ────────────────────────────────────────── -->
+      <section class="grid">
+        <!-- Create Order -->
+        <article class="card">
+          <h2>📦 Create Order (Command)</h2>
+          <form id="create-form">
+            <label for="customer-name">Customer Name</label>
+            <input id="customer-name" type="text" placeholder="e.g. Nguyễn Văn A" required />
+
+            <label>Items</label>
+            <div id="items-container" class="items-list">
+              <div class="item-row">
+                <input type="text" placeholder="Product name" class="item-name" required />
+                <input type="number" placeholder="Qty" class="item-qty" min="1" value="1" required />
+                <input type="number" placeholder="Price" class="item-price" min="0" step="1000" value="50000" required />
+                <button type="button" class="btn-danger remove-item" title="Remove">✕</button>
+              </div>
+            </div>
+            <button type="button" id="add-item-btn" class="btn-outline">+ Add Item</button>
+            <button type="submit" class="btn-primary">POST /orders</button>
+          </form>
+        </article>
+
+        <!-- Cancel Order -->
+        <article class="card">
+          <h2>🚫 Cancel Order (Command)</h2>
+          <form id="cancel-form">
+            <label for="cancel-id">Order ID</label>
+            <input id="cancel-id" type="text" placeholder="e.g. 1" required />
+            <button type="submit" class="btn-danger">PATCH /orders/:id/cancel</button>
+          </form>
+
+          <hr style="border-color: var(--border); margin: 18px 0;" />
+
+          <h2>🔍 Get Order By ID (Query)</h2>
+          <form id="detail-form">
+            <label for="detail-id">Order ID</label>
+            <input id="detail-id" type="text" placeholder="e.g. 1" required />
+            <button type="submit" class="btn-primary">GET /orders/:id</button>
+          </form>
+        </article>
+      </section>
+
+      <!-- ── output area + tabs ───────────────────────────────────── -->
+      <section class="card wide">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="orders">📋 Orders (Read Model)</button>
+          <button class="tab-btn" data-tab="events">⚡ Event Log</button>
+        </div>
+
+        <div id="tab-orders">
+          <div class="row">
+            <h2>All Orders</h2>
+            <button id="refresh-btn" type="button" class="btn-outline">GET /orders</button>
+          </div>
+          <pre id="output-orders">Ready.</pre>
+        </div>
+
+        <div id="tab-events" style="display:none;">
+          <div class="row">
+            <h2>Domain Events</h2>
+            <button id="refresh-events-btn" type="button" class="btn-outline">GET /events</button>
+          </div>
+          <div id="output-events"></div>
+          <pre id="output-events-raw" style="display:none;"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

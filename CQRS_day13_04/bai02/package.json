@@ -1,0 +1,10 @@
+{
+  "name": "cqrs-ex2-order-system",
+  "version": "1.0.0",
+  "description": "CQRS Order System with Event Sourcing",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "license": "MIT"
+}

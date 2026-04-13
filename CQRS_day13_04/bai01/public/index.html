@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo CQRS Tester</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="hero">
+        <p class="kicker">CQRS Exercise</p>
+        <h1>Todo API Tester</h1>
+        <p>Use this page to call Command and Query endpoints quickly.</p>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Create Todo</h2>
+          <form id="create-form">
+            <input id="create-title" type="text" placeholder="Todo title" required />
+            <label><input id="create-completed" type="checkbox" /> completed</label>
+            <button type="submit">POST /todos</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Update Todo</h2>
+          <form id="update-form">
+            <input id="update-id" type="text" placeholder="Todo id" required />
+            <input id="update-title" type="text" placeholder="New title (optional)" />
+            <label><input id="update-completed" type="checkbox" /> completed = true</label>
+            <label><input id="update-send-completed" type="checkbox" /> send completed field</label>
+            <button type="submit">PUT /todos/:id</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Delete Todo</h2>
+          <form id="delete-form">
+            <input id="delete-id" type="text" placeholder="Todo id" required />
+            <button type="submit">DELETE /todos/:id</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Get Todo By Id</h2>
+          <form id="detail-form">
+            <input id="detail-id" type="text" placeholder="Todo id" required />
+            <button type="submit">GET /todos/:id</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="card wide">
+        <div class="row">
+          <h2>Get All Todos</h2>
+          <button id="refresh-btn" type="button">GET /todos</button>
+        </div>
+        <pre id="output">Ready.</pre>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
