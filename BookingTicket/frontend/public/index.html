@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineBook – Movie Ticket System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red: #e63946;
+      --gold: #f4a261;
+      --dark: #0a0a0f;
+      --dark2: #111118;
+      --dark3: #1a1a26;
+      --dark4: #22222f;
+      --border: rgba(255,255,255,0.08);
+      --text: #e8e8f0;
+      --muted: #888899;
+      --success: #2ec4b6;
+      --fail: #e63946;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 64px;
+      background: rgba(10,10,15,0.95);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .logo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.8rem; letter-spacing: 3px;
+      color: var(--red);
+    }
+    .logo span { color: var(--gold); }
+    .nav-tabs { display: flex; gap: 0; }
+    .nav-tab {
+      padding: 0.4rem 1.2rem; cursor: pointer;
+      border: none; background: transparent; color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500;
+      border-radius: 6px; transition: all 0.2s;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--red); background: rgba(230,57,70,0.1); }
+    .nav-user {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .user-badge {
+      background: rgba(244,162,97,0.15); border: 1px solid rgba(244,162,97,0.3);
+      color: var(--gold); padding: 0.3rem 0.9rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 500;
+    }
+    .wallet-badge {
+      background: rgba(46,196,182,0.12); border: 1px solid rgba(46,196,182,0.28);
+      color: var(--success); padding: 0.3rem 0.75rem; border-radius: 10px;
+      font-size: 0.78rem; font-weight: 600; font-family: 'DM Mono', monospace;
+    }
+    .btn-logout {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); padding: 0.3rem 0.9rem; border-radius: 6px;
+      cursor: pointer; font-size: 0.8rem; transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* AUTH PAGE */
+    .auth-wrap {
+      min-height: calc(100vh - 64px);
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(230,57,70,0.08) 0%, transparent 60%);
+    }
+    .auth-card {
+      width: 400px; padding: 2.5rem;
+      background: var(--dark2); border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .auth-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2.2rem; color: var(--text); margin-bottom: 0.25rem;
+    }
+    .auth-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+    .auth-tabs {
+      display: flex; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem;
+    }
+    .auth-tab {
+      flex: 1; padding: 0.6rem; text-align: center; cursor: pointer;
+      border: none; background: transparent; color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: all 0.2s;
+    }
+    .auth-tab.active { color: var(--red); border-bottom-color: var(--red); }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; font-weight: 500; }
+    input {
+      width: 100%; padding: 0.7rem 1rem;
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 0.9rem;
+      font-family: 'DM Sans', sans-serif; transition: border-color 0.2s;
+    }
+    input:focus { outline: none; border-color: var(--red); }
+    .btn {
+      width: 100%; padding: 0.8rem; border: none; border-radius: 8px;
+      background: var(--red); color: #fff; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { background: #c62f3c; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-sec {
+      background: var(--dark3); border: 1px solid var(--border); color: var(--text);
+    }
+    .btn-sec:hover { background: var(--dark4); border-color: var(--gold); }
+    .alert {
+      padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem;
+      margin-top: 0.75rem;
+    }
+    .alert-err { background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.3); color: #ff6b78; }
+    .alert-ok { background: rgba(46,196,182,0.1); border: 1px solid rgba(46,196,182,0.3); color: var(--success); }
+
+    /* MOVIES PAGE */
+    .page-header {
+      padding: 2rem 2.5rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-title { font-family: 'Bebas Neue', cursive; font-size: 2rem; letter-spacing: 2px; }
+    .page-title span { color: var(--red); }
+    .btn-add {
+      padding: 0.5rem 1.2rem; border-radius: 8px;
+      background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.3);
+      color: var(--red); cursor: pointer; font-weight: 500; font-size: 0.85rem;
+      font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    }
+    .btn-add:hover { background: rgba(230,57,70,0.2); }
+
+    .movies-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem; padding: 2rem 2.5rem;
+    }
+    .movie-card {
+      background: var(--dark2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; transition: all 0.3s;
+      cursor: pointer;
+    }
+    .movie-card:hover { transform: translateY(-4px); border-color: rgba(230,57,70,0.4); box-shadow: 0 12px 40px rgba(230,57,70,0.1); }
+    .movie-poster {
+      height: 200px; background: var(--dark3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', cursive; font-size: 1.2rem; color: var(--red);
+      letter-spacing: 2px; position: relative; overflow: hidden;
+    }
+    .movie-poster::before {
+      content: '🎬'; font-size: 3rem; position: absolute; opacity: 0.2;
+    }
+    .movie-poster-text { position: relative; text-align: center; padding: 1rem; }
+    .movie-info { padding: 1rem; }
+    .movie-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; }
+    .movie-meta { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.6rem; }
+    .movie-price {
+      font-family: 'DM Mono', monospace; color: var(--gold); font-size: 0.9rem;
+    }
+    .seats-badge {
+      float: right; font-size: 0.7rem; padding: 0.2rem 0.5rem;
+      border-radius: 20px; background: rgba(46,196,182,0.1);
+      border: 1px solid rgba(46,196,182,0.3); color: var(--success);
+    }
+    .btn-book {
+      width: 100%; margin-top: 0.75rem; padding: 0.55rem;
+      background: var(--red); border: none; border-radius: 6px;
+      color: #fff; font-weight: 600; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; transition: all 0.2s;
+    }
+    .btn-book:hover { background: #c62f3c; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 200;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--dark2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem; width: 440px; max-width: 95vw;
+    }
+    .modal-title {
+      font-family: 'Bebas Neue', cursive; font-size: 1.6rem; margin-bottom: 1.5rem;
+      color: var(--gold);
+    }
+    .movie-summary {
+      background: var(--dark3); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;
+    }
+    .movie-summary h4 { color: var(--red); margin-bottom: 0.5rem; }
+    .movie-summary p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+    .seats-input { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .seats-input label { min-width: 100px; color: var(--muted); font-size: 0.85rem; }
+    .seats-ctrl { display: flex; align-items: center; gap: 0.5rem; }
+    .seats-ctrl button {
+      width: 32px; height: 32px; border-radius: 6px;
+      background: var(--dark3); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .seats-val { font-family: 'DM Mono', monospace; font-size: 1.2rem; min-width: 30px; text-align: center; }
+    .total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.75rem 0; border-top: 1px solid var(--border); margin-bottom: 1rem;
+    }
+    .total-label { color: var(--muted); font-size: 0.85rem; }
+    .total-val { font-family: 'DM Mono', monospace; color: var(--gold); font-size: 1.1rem; font-weight: 600; }
+    .modal-btns { display: flex; gap: 0.75rem; }
+    .modal-btns .btn { flex: 1; margin-top: 0; }
+
+    /* BOOKINGS PAGE */
+    .bookings-list { padding: 1.5rem 2.5rem; }
+    .booking-item {
+      background: var(--dark2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+    .booking-id {
+      font-family: 'DM Mono', monospace; color: var(--gold); font-size: 0.8rem;
+      min-width: 120px;
+    }
+    .booking-info { flex: 1; }
+    .booking-movie { font-weight: 600; margin-bottom: 0.25rem; }
+    .booking-meta { font-size: 0.8rem; color: var(--muted); }
+    .status-badge {
+      padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+    }
+    .status-PENDING { background: rgba(244,162,97,0.1); border: 1px solid rgba(244,162,97,0.3); color: var(--gold); }
+    .status-CONFIRMED { background: rgba(46,196,182,0.1); border: 1px solid rgba(46,196,182,0.3); color: var(--success); }
+    .status-FAILED { background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.3); color: var(--fail); }
+    .empty-state { text-align: center; padding: 4rem; color: var(--muted); }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    /* EVENTS LOG PAGE */
+    .events-wrap { padding: 1.5rem 2.5rem; }
+    .events-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .event-panel {
+      background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .event-panel-header {
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.5rem;
+      font-weight: 600; font-size: 0.85rem;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-red { background: var(--red); }
+    .dot-green { background: var(--success); }
+    .dot-gold { background: var(--gold); }
+    .event-log {
+      height: 300px; overflow-y: auto; padding: 0.75rem;
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    }
+    .event-log::-webkit-scrollbar { width: 4px; }
+    .event-log::-webkit-scrollbar-track { background: var(--dark2); }
+    .event-log::-webkit-scrollbar-thumb { background: var(--dark4); border-radius: 2px; }
+    .log-item {
+      padding: 0.6rem 0.75rem; border-radius: 6px; margin-bottom: 0.5rem;
+      border-left: 3px solid transparent;
+    }
+    .log-item.ok { border-left-color: var(--success); background: rgba(46,196,182,0.05); }
+    .log-item.fail { border-left-color: var(--fail); background: rgba(230,57,70,0.05); }
+    .log-item.info { border-left-color: var(--gold); background: rgba(244,162,97,0.05); }
+    .log-time { color: var(--muted); font-size: 0.68rem; margin-bottom: 0.2rem; }
+    .log-event { color: var(--text); }
+    .log-event .highlight { color: var(--gold); }
+    .notif-item {
+      padding: 1rem; margin-bottom: 0.75rem;
+      background: var(--dark3); border-radius: 8px; font-size: 0.82rem; line-height: 1.7;
+    }
+    .notif-ok { border-left: 3px solid var(--success); }
+    .notif-fail { border-left: 3px solid var(--fail); }
+    .notif-info { border-left: 3px solid var(--gold); }
+    .refresh-btn {
+      background: var(--dark3); border: 1px solid var(--border); color: var(--muted);
+      padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer;
+      font-size: 0.78rem; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+    }
+    .refresh-btn:hover { border-color: var(--success); color: var(--success); }
+
+    /* ADD MOVIE MODAL */
+    .add-movie-form .form-group { margin-bottom: 0.9rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    /* LOADING */
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      background: var(--dark2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem 1.5rem; min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4); animation: slideUp 0.3s ease;
+    }
+    .toast.ok { border-color: rgba(46,196,182,0.4); }
+    .toast.err { border-color: rgba(230,57,70,0.4); }
+    .toast-title { font-weight: 600; margin-bottom: 0.2rem; }
+    .toast.ok .toast-title { color: var(--success); }
+    .toast.err .toast-title { color: var(--fail); }
+    .toast-msg { font-size: 0.82rem; color: var(--muted); }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Cine<span>Book</span></div>
+  <div class="nav-tabs" id="navTabs" style="display:none">
+    <button class="nav-tab active" onclick="showPage('movies')">🎬 Phim</button>
+    <button class="nav-tab" onclick="showPage('bookings')">🎟️ Vé của tôi</button>
+    <button class="nav-tab" onclick="showPage('events')">📡 Events Log</button>
+  </div>
+  <div class="nav-user" id="navUser" style="display:none">
+    <span class="wallet-badge" id="walletBadge" title="Số dư ví (read model)">—</span>
+    <span class="user-badge" id="userBadge">User</span>
+    <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+  </div>
+</nav>
+
+<!-- AUTH PAGE -->
+<div class="page active" id="page-auth">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">CineBook</div>
+      <div class="auth-sub">Hệ thống đặt vé xem phim</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Đăng nhập</button>
+        <button class="auth-tab" id="tab-register" onclick="switchAuth('register')">Đăng ký</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="form-login">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="user@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu</label>
+          <input type="password" id="login-pass" placeholder="••••••••" />
+        </div>
+        <button class="btn" onclick="doLogin()">Đăng nhập</button>
+        <div id="login-msg"></div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="form-register" style="display:none">
+        <div class="form-group">
+          <label>Tên người dùng</label>
+          <input type="text" id="reg-name" placeholder="Nguyễn Văn A" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="user@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu</label>
+          <input type="password" id="reg-pass" placeholder="••••••••" />
+        </div>
+        <button class="btn" onclick="doRegister()">Tạo tài khoản</button>
+        <div id="register-msg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOVIES PAGE -->
+<div class="page" id="page-movies">
+  <div class="page-header">
+    <div class="page-title">Danh sách <span>Phim</span></div>
+    <button class="btn-add" onclick="openAddMovie()">+ Thêm phim</button>
+  </div>
+  <div class="movies-grid" id="moviesGrid">
+    <div style="color:var(--muted);padding:2rem">Đang tải phim...</div>
+  </div>
+</div>
+
+<!-- BOOKINGS PAGE -->
+<div class="page" id="page-bookings">
+  <div class="page-header">
+    <div class="page-title">Vé <span>của tôi</span></div>
+    <button class="refresh-btn" onclick="loadBookings()">↻ Làm mới</button>
+  </div>
+  <div class="bookings-list" id="bookingsList">
+    <div class="empty-state"><div class="icon">🎟️</div><div>Chưa có vé nào</div></div>
+  </div>
+</div>
+
+<!-- EVENTS LOG PAGE -->
+<div class="page" id="page-events">
+  <div class="page-header">
+    <div class="page-title">Events <span>Log</span></div>
+    <button class="refresh-btn" onclick="loadEventLogs()">↻ Làm mới</button>
+  </div>
+  <div class="events-wrap">
+    <div class="events-grid">
+      <div class="event-panel">
+        <div class="event-panel-header">
+          <div class="dot dot-red"></div> Payment Logs
+        </div>
+        <div class="event-log" id="paymentLog">
+          <div style="color:var(--muted);padding:1rem">Nhấn "Làm mới" để xem logs...</div>
+        </div>
+      </div>
+      <div class="event-panel">
+        <div class="event-panel-header">
+          <div class="dot dot-green"></div> Notifications
+        </div>
+        <div class="event-log" id="notifLog">
+          <div style="color:var(--muted);padding:1rem">Nhấn "Làm mới" để xem logs...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOK MODAL -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <div class="modal-title">🎟️ Đặt vé</div>
+    <div class="movie-summary" id="bookSummary"></div>
+    <div class="seats-input">
+      <label>Số ghế</label>
+      <div class="seats-ctrl">
+        <button onclick="changeSeats(-1)">−</button>
+        <div class="seats-val" id="seatsVal">1</div>
+        <button onclick="changeSeats(1)">+</button>
+      </div>
+    </div>
+    <div class="total-row">
+      <div class="total-label">Tổng tiền</div>
+      <div class="total-val" id="totalVal">—</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-sec" onclick="closeModal('bookModal')">Hủy</button>
+      <button class="btn" onclick="doBooking()" id="confirmBookBtn">Xác nhận đặt vé</button>
+    </div>
+    <div id="book-msg" style="margin-top:0.75rem"></div>
+  </div>
+</div>
+
+<!-- ADD MOVIE MODAL -->
+<div class="modal-overlay" id="addMovieModal">
+  <div class="modal">
+    <div class="modal-title">🎬 Thêm Phim Mới</div>
+    <div class="add-movie-form">
+      <div class="form-group">
+        <label>Tên phim</label>
+        <input type="text" id="mv-title" placeholder="Tên phim..." />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Thể loại</label>
+          <input type="text" id="mv-genre" placeholder="Action/Drama..." />
+        </div>
+        <div class="form-group">
+          <label>Thời lượng (phút)</label>
+          <input type="number" id="mv-duration" placeholder="120" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Giá vé (VND)</label>
+          <input type="number" id="mv-price" placeholder="100000" />
+        </div>
+        <div class="form-group">
+          <label>Số ghế</label>
+          <input type="number" id="mv-seats" placeholder="100" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mô tả</label>
+        <input type="text" id="mv-desc" placeholder="Mô tả ngắn..." />
+      </div>
+      <div class="form-group">
+        <label>Suất chiếu</label>
+        <input type="text" id="mv-showtime" placeholder="2025-07-01 19:00" />
+      </div>
+    </div>
+    <div class="modal-btns" style="margin-top:1rem">
+      <button class="btn btn-sec" onclick="closeModal('addMovieModal')">Hủy</button>
+      <button class="btn" onclick="doAddMovie()">Thêm phim</button>
+    </div>
+    <div id="add-movie-msg" style="margin-top:0.75rem"></div>
+  </div>
+</div>
+
+<script>
+  const API = {
+    user: 'http://172.16.33.164:8081',
+    movie: 'http://172.16.33.148:8082',
+    booking: 'http://172.16.33.158:8083',
+    payment: 'http://172.16.34.216:8084',
+    wallet: 'http://172.16.34.216:8085'
+  };
+
+  let currentUser = null;
+  let selectedMovie = null;
+  let selectedSeats = 1;
+
+  async function loadWalletBalance() {
+    const el = document.getElementById('walletBadge');
+    if (!currentUser || !el) return;
+    el.textContent = '…';
+    try {
+      const res = await fetch(`${API.wallet}/read/wallets/${currentUser.id}/summary`);
+      const data = await res.json();
+      if (!res.ok) {
+        el.textContent = res.status === 404 ? 'Wallet: n/a' : 'Wallet: error';
+        return;
+      }
+      el.textContent = Number(data.balance).toLocaleString('vi-VN') + ' \u0111';
+    } catch {
+      el.textContent = 'Wallet: offline';
+    }
+  }
+
+  // ── AUTH ──────────────────────────────────────────
+  function switchAuth(tab) {
+    document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    const msgEl = document.getElementById('login-msg');
+    if (!email || !pass) return showMsg(msgEl, 'Vui lòng nhập đầy đủ thông tin', 'err');
+
+    try {
+      const res = await fetch(`${API.user}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+      const data = await res.json();
+      if (!res.ok) return showMsg(msgEl, data.error || 'Đăng nhập thất bại', 'err');
+
+      currentUser = data.user;
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      onLoggedIn();
+    } catch (e) {
+      showMsg(msgEl, 'Không kết nối được User Service (port 8081)', 'err');
+    }
+  }
+
+  async function doRegister() {
+    const username = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    const msgEl = document.getElementById('register-msg');
+    if (!username || !email || !pass) return showMsg(msgEl, 'Vui lòng nhập đầy đủ thông tin', 'err');
+
+    try {
+      const res = await fetch(`${API.user}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password: pass })
+      });
+      const data = await res.json();
+      if (!res.ok) return showMsg(msgEl, data.error || 'Đăng ký thất bại', 'err');
+
+      showMsg(msgEl, `Đăng ký thành công! Event USER_REGISTERED đã được publish. Vui lòng đăng nhập.`, 'ok');
+      setTimeout(() => switchAuth('login'), 2000);
+    } catch (e) {
+      showMsg(msgEl, 'Không kết nối được User Service (port 8081)', 'err');
+    }
+  }
+
+  function onLoggedIn() {
+    document.getElementById('navTabs').style.display = 'flex';
+    document.getElementById('navUser').style.display = 'flex';
+    document.getElementById('userBadge').textContent = '👤 ' + currentUser.username;
+    loadWalletBalance();
+    showPage('movies');
+    loadMovies();
+  }
+
+  function logout() {
+    currentUser = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    document.getElementById('navTabs').style.display = 'none';
+    document.getElementById('navUser').style.display = 'none';
+    showPage('auth');
+  }
+
+  // ── NAVIGATION ────────────────────────────────────
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    const tabs = { movies: 0, bookings: 1, events: 2 };
+    const idx = tabs[name];
+    if (idx !== undefined) document.querySelectorAll('.nav-tab')[idx]?.classList.add('active');
+
+    if (name === 'bookings') { loadBookings(); loadWalletBalance(); }
+    if (name === 'events') loadEventLogs();
+  }
+
+  // ── MOVIES ────────────────────────────────────────
+  async function loadMovies() {
+    const grid = document.getElementById('moviesGrid');
+    grid.innerHTML = '<div style="color:var(--muted);padding:2rem">Đang tải...</div>';
+    try {
+      const res = await fetch(`${API.movie}/movies`);
+      const data = await res.json();
+      renderMovies(data.movies || []);
+    } catch (e) {
+      grid.innerHTML = '<div style="color:var(--fail);padding:2rem">⚠️ Không kết nối được Movie Service (port 8082)</div>';
+    }
+  }
+
+  function renderMovies(movies) {
+    const grid = document.getElementById('moviesGrid');
+    if (!movies.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="icon">🎬</div><div>Chưa có phim nào</div></div>';
+      return;
+    }
+    grid.innerHTML = movies.map(m => `
+      <div class="movie-card">
+        <div class="movie-poster">
+          <div class="movie-poster-text">${m.title}</div>
+        </div>
+        <div class="movie-info">
+          <div class="movie-title">${m.title}</div>
+          <div class="movie-meta">${m.genre} • ${m.duration} phút • ${m.rating}</div>
+          <div class="movie-meta">${m.showtime}</div>
+          <div style="margin-top:0.5rem">
+            <span class="movie-price">${Number(m.price).toLocaleString()} VND</span>
+            <span class="seats-badge">💺 ${m.availableSeats} ghế</span>
+          </div>
+          <button class="btn-book" onclick='openBook(${JSON.stringify(m).replace(/'/g,"&apos;")})'>Đặt vé</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openAddMovie() {
+    document.getElementById('addMovieModal').classList.add('open');
+    document.getElementById('add-movie-msg').innerHTML = '';
+  }
+
+  async function doAddMovie() {
+    const title = document.getElementById('mv-title').value.trim();
+    const genre = document.getElementById('mv-genre').value.trim();
+    const duration = document.getElementById('mv-duration').value;
+    const price = document.getElementById('mv-price').value;
+    const seats = document.getElementById('mv-seats').value;
+    const description = document.getElementById('mv-desc').value.trim();
+    const showtime = document.getElementById('mv-showtime').value.trim();
+    const msgEl = document.getElementById('add-movie-msg');
+    if (!title || !genre || !duration || !price || !seats) return showMsg(msgEl, 'Vui lòng nhập đầy đủ thông tin', 'err');
+
+    try {
+      const res = await fetch(`${API.movie}/movies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, genre, duration, price, seats, description, showtime })
+      });
+      const data = await res.json();
+      if (!res.ok) return showMsg(msgEl, data.error || 'Thêm phim thất bại', 'err');
+      showMsg(msgEl, 'Thêm phim thành công!', 'ok');
+      setTimeout(() => { closeModal('addMovieModal'); loadMovies(); }, 1200);
+    } catch (e) {
+      showMsg(msgEl, 'Không kết nối được Movie Service', 'err');
+    }
+  }
+
+  // ── BOOKING ───────────────────────────────────────
+  function openBook(movie) {
+    if (!currentUser) return showToast('Vui lòng đăng nhập', '', 'err');
+    selectedMovie = movie;
+    selectedSeats = 1;
+    document.getElementById('seatsVal').textContent = 1;
+    document.getElementById('bookSummary').innerHTML = `
+      <h4>${movie.title}</h4>
+      <p>${movie.genre} • ${movie.duration} phút<br/>
+      Suất: ${movie.showtime}<br/>
+      Giá: ${Number(movie.price).toLocaleString()} VND/ghế<br/>
+      Còn: ${movie.availableSeats} ghế</p>
+    `;
+    updateTotal();
+    document.getElementById('book-msg').innerHTML = '';
+    document.getElementById('bookModal').classList.add('open');
+  }
+
+  function changeSeats(delta) {
+    if (!selectedMovie) return;
+    const newVal = selectedSeats + delta;
+    if (newVal < 1 || newVal > Math.min(10, selectedMovie.availableSeats)) return;
+    selectedSeats = newVal;
+    document.getElementById('seatsVal').textContent = selectedSeats;
+    updateTotal();
+  }
+
+  function updateTotal() {
+    if (!selectedMovie) return;
+    const total = selectedMovie.price * selectedSeats;
+    document.getElementById('totalVal').textContent = total.toLocaleString() + ' VND';
+  }
+
+  async function doBooking() {
+    const msgEl = document.getElementById('book-msg');
+    const btn = document.getElementById('confirmBookBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Đang xử lý...';
+
+    try {
+      const res = await fetch(`${API.booking}/bookings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          username: currentUser.username,
+          movieId: selectedMovie.id,
+          movieTitle: selectedMovie.title,
+          seats: selectedSeats,
+          totalPrice: selectedMovie.price * selectedSeats
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const extra =
+          res.status === 402 && data.balance != null
+            ? ` (số dư: ${Number(data.balance).toLocaleString('vi-VN')} đ, cần: ${Number(data.required).toLocaleString('vi-VN')} đ)`
+            : '';
+        showMsg(msgEl, (data.error || 'Đặt vé thất bại') + extra, 'err');
+        btn.disabled = false; btn.textContent = 'Xác nhận đặt vé';
+        loadWalletBalance();
+        return;
+      }
+
+      const bal =
+        data.wallet && data.wallet.balanceAfter != null
+          ? ` Số dư ví còn: ${Number(data.wallet.balanceAfter).toLocaleString('vi-VN')} đ.`
+          : '';
+      showMsg(
+        msgEl,
+        `Đặt vé thành công — ${data.booking.id}. Thanh toán qua ví (event sourcing).${bal}`,
+        'ok'
+      );
+      showToast('Đã trừ ví', data.booking.id, 'ok');
+      loadWalletBalance();
+
+      setTimeout(() => {
+        closeModal('bookModal');
+        loadMovies();
+        btn.disabled = false; btn.textContent = 'Xác nhận đặt vé';
+      }, 2500);
+    } catch (e) {
+      showMsg(msgEl, 'Không kết nối được Booking Service (port 8083)', 'err');
+      btn.disabled = false; btn.textContent = 'Xác nhận đặt vé';
+    }
+  }
+
+  // ── MY BOOKINGS ───────────────────────────────────
+  async function loadBookings() {
+    if (!currentUser) return;
+    const list = document.getElementById('bookingsList');
+    list.innerHTML = '<div style="color:var(--muted);padding:1rem">Đang tải...</div>';
+    try {
+      const res = await fetch(`${API.booking}/bookings?userId=${currentUser.id}`);
+      const data = await res.json();
+      const bookings = data.bookings || [];
+      if (!bookings.length) {
+        list.innerHTML = '<div class="empty-state"><div class="icon">🎟️</div><div>Chưa có vé nào</div></div>';
+        return;
+      }
+      list.innerHTML = bookings.reverse().map(b => `
+        <div class="booking-item">
+          <div class="booking-id">${b.id}</div>
+          <div class="booking-info">
+            <div class="booking-movie">${b.movieTitle}</div>
+            <div class="booking-meta">${b.seats} ghế · ${Number(b.totalPrice).toLocaleString()} VND · ${new Date(b.createdAt).toLocaleString('vi-VN')}</div>
+          </div>
+          <div class="status-badge status-${b.status}">${b.status}</div>
+        </div>
+      `).join('');
+    } catch (e) {
+      list.innerHTML = '<div style="color:var(--fail);padding:1rem">⚠️ Không kết nối được Booking Service</div>';
+    }
+  }
+
+  // ── EVENTS LOG ────────────────────────────────────
+  async function loadEventLogs() {
+    try {
+      const [pRes, nRes] = await Promise.all([
+        fetch(`${API.payment}/payments`),
+        fetch(`${API.payment}/notifications`)
+      ]);
+      const pData = await pRes.json();
+      const nData = await nRes.json();
+
+      const payLog = document.getElementById('paymentLog');
+      if (!pData.payments?.length) {
+        payLog.innerHTML = '<div style="color:var(--muted);padding:0.5rem">Chưa có payment nào</div>';
+      } else {
+        payLog.innerHTML = pData.payments.reverse().map(p => `
+          <div class="log-item ${p.status === 'SUCCESS' ? 'ok' : 'fail'}">
+            <div class="log-time">${new Date(p.timestamp).toLocaleString('vi-VN')}</div>
+            <div class="log-event">
+              ${p.status === 'SUCCESS' ? '✅' : '❌'} <span class="highlight">${p.bookingId}</span><br/>
+              User: ${p.username} · ${Number(p.amount).toLocaleString()} VND
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const notifLog = document.getElementById('notifLog');
+      if (!nData.notifications?.length) {
+        notifLog.innerHTML = '<div style="color:var(--muted);padding:0.5rem">Chưa có thông báo nào</div>';
+      } else {
+        notifLog.innerHTML = nData.notifications.reverse().map(n => {
+          const cls = n.type === 'PAYMENT_COMPLETED' ? 'notif-ok' : n.type === 'BOOKING_FAILED' ? 'notif-fail' : 'notif-info';
+          return `<div class="notif-item ${cls}">${n.message.replace(/\n/g, '<br/>')}</div>`;
+        }).join('');
+      }
+    } catch (e) {
+      document.getElementById('paymentLog').innerHTML = '<div style="color:var(--fail);padding:0.5rem">⚠️ Không kết nối được Payment Service (port 8084)</div>';
+    }
+  }
+
+  // ── UTILS ─────────────────────────────────────────
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  function showMsg(el, msg, type) {
+    el.innerHTML = `<div class="alert alert-${type === 'ok' ? 'ok' : 'err'}" style="white-space:pre-wrap">${msg}</div>`;
+  }
+
+  function showToast(title, msg, type) {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<div class="toast-title">${title}</div><div class="toast-msg">${msg}</div>`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+  }
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+
+  // Init: check if already logged in
+  (function init() {
+    const saved = localStorage.getItem('user');
+    if (saved) {
+      try {
+        currentUser = JSON.parse(saved);
+        onLoggedIn();
+      } catch (e) { }
+    }
+  })();
+</script>
+</body>
+</html>
